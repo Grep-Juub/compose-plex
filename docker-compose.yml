@@ -1,0 +1,88 @@
+version: '3.7'
+
+services:
+
+  plex:
+    image: linuxserver/plex
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - VERSION=latest
+      - TZ=Europe/Paris
+    network_mode: host
+    restart: always
+    volumes:
+      - ./config/plex:/config
+      - ./data/series:/data/tvshows
+      - ./data/movies:/data/movies
+
+  deluge:
+    image: linuxserver/deluge
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    restart: always
+    volumes:
+      - ./config/deluge:/config
+      - ./data/downloads:/downloads
+
+  sonarr:
+    image: linuxserver/sonarr
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+    restart: always
+    volumes:
+      - ./config/sonarr:/config
+      - ./data/series:/tv
+      - ./data/downloads:/downloads
+
+  radarr:
+    image: linuxserver/radarr
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+    restart: always
+    volumes:
+      - ./config/radarr:/config
+      - ./data/movies:/movies
+      - ./data/downloads:/downloads
+
+  jackett:
+    image: linuxserver/jackett
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Paris
+    restart: always
+    volumes:
+      - ./config/jackett:/config
+      - ./data/downloads:/downloads
+
+  traefik:
+    image: traefik:alpine
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+      - target: 8080
+        published: 8080
+        mode: host
+    environment:
+        - OVH_ENDPOINT=ovh-eu
+        - OVH_APPLICATION_KEY=APP_KEY
+        - OVH_APPLICATION_SECRET=APP_SECRET
+        - OVH_CONSUMER_KEY=APP_CONSUMER_KEY
+    command:
+      - "-c /config.toml"
+    restart: always
+    volumes:
+      - ./config/traefik/acme.json:/acme.json
+      - ./config/traefik/traefik.toml:/traefik.toml
