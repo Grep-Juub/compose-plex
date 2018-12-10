@@ -1,0 +1,105 @@
+# defaultEntryPoints
+defaultEntryPoints = ["http", "https"]
+insecureSkipVerify = true
+
+logLevel = "INFO"
+debug = false
+
+[api]
+  entryPoint = "api"
+  dashboard = true
+  debug = false
+
+[entryPoints]
+  [entryPoints.api]
+  address = ":8080"
+
+  [entryPoints.http]
+  address = ":80"
+  [entryPoints.http.redirect]
+  entryPoint = "https"
+
+  [entryPoints.https]
+  address = ":443"
+  [entryPoints.https.tls]
+
+[file]
+  watch = true
+
+[acme]
+  email = ""
+  storage = "acme.json"
+  entryPoint = "https"
+  acmeLogging = true
+
+[acme.dnsChallenge]
+    provider = "ovh"
+    delayBeforeCheck = 0
+
+[[acme.domains]]
+  main = "*.domain.ovh"
+  sans = ["domain.ovh"]
+
+[frontends]
+
+  [frontends.plex]
+  passHostHeader = true
+  backend = "plex"
+  entrypoints = ["https"]
+    [frontends.plex.routes.read]
+    rule = "Host:plex.domain.ovh"
+
+  [frontends.sonarr]
+    passHostHeader = true
+    backend = "sonarr"
+    entrypoints = ["https"]
+      [frontends.sonarr.routes.read]
+       rule = "Host:sonarr.domain.ovh"
+
+  [frontends.radarr]
+  passHostHeader = true
+  backend = "radarr"
+  entrypoints = ["https"]
+    [frontends.radarr.routes.read]
+    rule = "Host:radarr.domain.ovh"
+
+  [frontends.deluge]
+    passHostHeader = true
+    backend = "deluge"
+    entrypoints = ["https"]
+      [frontends.deluge.routes.read]
+       rule = "Host:deluge.domain.ovh"
+
+  [frontends.jackett]
+    passHostHeader = true
+    backend = "jackett"
+    entrypoints = ["https"]
+      [frontends.jackett.routes.read]
+       rule = "Host:jackett.domain.ovh"
+
+[backends]
+
+  [backends.plex]
+    [backends.plex.servers.plex_1]
+    url = "http://my_ip:32400"
+    weight = 10
+
+ [backends.sonarr]
+    [backends.sonarr.servers.sonarr_1]
+    url = "http://sonarr:8989"
+    weight = 10
+
+ [backends.radarr]
+    [backends.radarr.servers.radarr_1]
+    url = "http://radarr:7878"
+    weight = 10
+
+ [backends.deluge]
+    [backends.deluge.servers.deluge_1]
+    url = "http://my_ip:8112"
+    weight = 10
+
+ [backends.jackett]
+    [backends.jackett.servers.jackett_1]
+    url = "http://jackett:9117"
+    weight = 10
